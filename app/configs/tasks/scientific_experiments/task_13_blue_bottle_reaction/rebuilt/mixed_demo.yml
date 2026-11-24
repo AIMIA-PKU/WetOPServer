@@ -1,0 +1,252 @@
+# WET-OP task_13 "Blue-Bottle Redox Cycle" — GenManip task config for the rebuilt scene
+# (same structure as the official task_01 validation/mixed/mixed_1.yml and the task02 rebuild).
+#
+# Scene : generate_asset/scene_usds/task13/scene.usda  (built by tools/build_task13_scene.py)
+#         copy/link it to saved/assets/scene_usds/scientific_experiments/task_13_blue_bottle_reaction/rebuilt/scene.usda
+#         together with single_asset/ and generate_asset/single_usds/ at the same relative location
+#         (the flask is generate_asset/single_usds/conical_flask: official flask + welded SDF collider, see README).
+# Metric: genmanip/extensions/metrics/scientific_experiments/task_13_blue_bottle_reaction.py (official GenManip code).
+#         Its flow_controller attributes (blueBottle:rodLoaded / blueBottle:blueFraction) must be driven every step by
+#         tools/task13_flow_controller.py — the official runtime that does this is not part of the release.
+#
+# Scoring: GenManip averages metric_weight*status inside a stage, then averages the 6 stages.
+# Weights reproduce the official per-criterion weights (Wet-OP-Bench-doc assets/tasks.js, id 7; they sum to 1):
+#   S1  >=60% of cylinder 01 / 02 liquid in the flask            2 x 0.10   -> 1.2 each
+#   S2  glass rod dipped in methylene blue (rodLoaded)           0.10       -> 0.6
+#   S3  wetted rod touches the mixture (blueFraction >= 0.9)     0.20       -> 1.2
+#   S4  stationary mixture colourless (blueFraction <= 0.1)      0.10       -> 0.6
+#   S5  shaken back to blue (blueFraction >= 0.9)                0.20       -> 1.2
+#   S6  cylinders 01/02 + flask upright, rod on tray             4 x 0.05   -> 1.2 each
+# num_steps 36000 (300 s at 120 Hz): the official media episode is 287 s.
+demonstration_configs:
+- domain_randomization: &id001
+    cameras:
+      config_path: configs/cameras/fixed_camera_lift2_scientific_experiments.yml
+      type: fixed
+    random_environment:
+      has_wall: false
+      hdr: false
+      robot_base_position: false
+      robot_eepose: false
+      table_texture: false
+      table_type: false
+      wall_texture: false
+    rewrite_instruction: false
+  generation_config: &id002
+    action_path:
+      mode: auto
+      robot: 0
+    articulation: []
+    goal:
+    # ---- S1 >=60% of each cylinder's liquid in the flask
+    - - - type: manip/scientific_experiments/task_13_blue_bottle_reaction
+          skip_steps: 100
+          succ_cnts: 100
+          conical_flask_uid: conical_flask
+          gc_1_liquid_mesh_prim_path: /World/_scene/task13_liquid/gc_1_liquid/ParticleSet
+          gc_2_liquid_mesh_prim_path: /World/_scene/task13_liquid/gc_2_liquid/ParticleSet
+          flow_controller_prim_path: /World/_scene/flow_controller
+          condition_type: gc_1_liquid_in_conical_flask
+          metric_weight: 1.2
+        - type: manip/scientific_experiments/task_13_blue_bottle_reaction
+          skip_steps: 100
+          succ_cnts: 100
+          conical_flask_uid: conical_flask
+          gc_1_liquid_mesh_prim_path: /World/_scene/task13_liquid/gc_1_liquid/ParticleSet
+          gc_2_liquid_mesh_prim_path: /World/_scene/task13_liquid/gc_2_liquid/ParticleSet
+          flow_controller_prim_path: /World/_scene/flow_controller
+          condition_type: gc_2_liquid_in_conical_flask
+          metric_weight: 1.2
+    # ---- S2 glass rod dipped in methylene blue
+    - - - type: manip/scientific_experiments/task_13_blue_bottle_reaction
+          skip_steps: 1
+          succ_cnts: 1
+          conical_flask_uid: conical_flask
+          gc_1_liquid_mesh_prim_path: /World/_scene/task13_liquid/gc_1_liquid/ParticleSet
+          gc_2_liquid_mesh_prim_path: /World/_scene/task13_liquid/gc_2_liquid/ParticleSet
+          flow_controller_prim_path: /World/_scene/flow_controller
+          condition_type: glass_rod_get_dye
+          metric_weight: 0.6
+    # ---- S3 wetted rod touches the mixture -> blue
+    - - - type: manip/scientific_experiments/task_13_blue_bottle_reaction
+          skip_steps: 1
+          succ_cnts: 1
+          conical_flask_uid: conical_flask
+          gc_1_liquid_mesh_prim_path: /World/_scene/task13_liquid/gc_1_liquid/ParticleSet
+          gc_2_liquid_mesh_prim_path: /World/_scene/task13_liquid/gc_2_liquid/ParticleSet
+          flow_controller_prim_path: /World/_scene/flow_controller
+          condition_type: is_blue
+          metric_weight: 1.2
+    # ---- S4 stationary mixture becomes colourless
+    - - - type: manip/scientific_experiments/task_13_blue_bottle_reaction
+          skip_steps: 1
+          succ_cnts: 1
+          conical_flask_uid: conical_flask
+          gc_1_liquid_mesh_prim_path: /World/_scene/task13_liquid/gc_1_liquid/ParticleSet
+          gc_2_liquid_mesh_prim_path: /World/_scene/task13_liquid/gc_2_liquid/ParticleSet
+          flow_controller_prim_path: /World/_scene/flow_controller
+          condition_type: is_colorless
+          metric_weight: 0.6
+    # ---- S5 shaking turns it blue again
+    - - - type: manip/scientific_experiments/task_13_blue_bottle_reaction
+          skip_steps: 1
+          succ_cnts: 1
+          conical_flask_uid: conical_flask
+          gc_1_liquid_mesh_prim_path: /World/_scene/task13_liquid/gc_1_liquid/ParticleSet
+          gc_2_liquid_mesh_prim_path: /World/_scene/task13_liquid/gc_2_liquid/ParticleSet
+          flow_controller_prim_path: /World/_scene/flow_controller
+          condition_type: is_blue
+          metric_weight: 1.2
+    # ---- S6 both cylinders and the flask upright, rod on the tray
+    - - - type: manip/default/match_local_world_orientation
+          skip_steps: 50
+          succ_cnts: 100
+          obj_uid: graduated_cylinder_01
+          constraint_spec: {type: AND, constraints: [{local_axis: Y, world_axis: Z, angle_range: [0, 10]}]}
+          metric_weight: 1.2
+        - type: manip/default/match_local_world_orientation
+          skip_steps: 50
+          succ_cnts: 100
+          obj_uid: graduated_cylinder_02
+          constraint_spec: {type: AND, constraints: [{local_axis: Y, world_axis: Z, angle_range: [0, 10]}]}
+          metric_weight: 1.2
+        - type: manip/default/match_local_world_orientation
+          skip_steps: 50
+          succ_cnts: 100
+          obj_uid: conical_flask
+          constraint_spec: {type: AND, constraints: [{local_axis: Z, world_axis: Z, angle_range: [0, 10]}]}
+          metric_weight: 1.2
+        - type: manip/default/sr_based_genmanip_relationship
+          skip_steps: 50
+          succ_cnts: 100
+          obj1_uid: glass_rod
+          obj2_uid: tray
+          position: "on"
+          metric_weight: 1.2
+    mode: manual
+    planner: curobo
+  instruction: Pour the aqueous glucose solution and then the aqueous sodium hydroxide solution into the empty Erlenmeyer flask, standing each emptied cylinder upright. Add a small amount of methylene blue solution using a glass rod and lay the rod on the clean tray. Wait until the mixture becomes colorless, then shake the flask until the mixture turns blue and set the flask upright on the table.
+  layout_config: &id003
+    ignored_objects: []
+    type: None
+  mode: manual
+  num_episode: 50
+  object_config: {}
+  preprocess_config: []
+  robots:
+  - &id004
+    type: manip/lift2/R5a
+    usd_path: robot_usds/lift2_scientific_experiments/robot.usd
+    position: [0.0, -0.7, 0.0]
+    orientation: [0.7071067812, 0.0, 0.0, 0.7071067812]
+  table_uid: table
+  physics_scene_config:
+    BounceThreshold: 0.0
+    BroadphaseType: GPU
+    CollisionSystem: PCM
+    EnableCCD: false
+    EnableEnhancedDeterminism: false
+    EnableExternalForcesEveryIteration: false
+    EnableGPUDynamics: true
+    EnableResidualReporting: false
+    EnableSceneQuerySupport: true
+    EnableStabilization: true
+    FrictionCorrelationDistance: 0.02500000037252903
+    FrictionOffsetThreshold: 0.03999999910593033
+    FrictionType: patch
+    GpuCollisionStackSize: 67108864
+    GpuFoundLostAggregatePairsCapacity: 10485760
+    GpuFoundLostPairsCapacity: 262144
+    GpuHeapCapacity: 67108864
+    GpuMaxDeformableSurfaceContacts: 1048576
+    GpuMaxHairContacts: 1048576
+    GpuMaxNumPartitions: 8
+    GpuMaxParticleContacts: 1048576
+    GpuMaxRigidContactCount: 524288
+    GpuMaxRigidPatchCount: 81920
+    GpuMaxSoftBodyContacts: 1048576
+    GpuTempBufferCapacity: 16777216
+    GpuTotalAggregatePairsCapacity: 1024
+    InvertCollisionGroupFilter: false
+    MaxBiasCoefficient: Inf
+    MaxPositionIterationCount: 255
+    MaxVelocityIterationCount: 255
+    MinPositionIterationCount: 1
+    MinVelocityIterationCount: 0
+    ReportKinematicKinematicPairs: false
+    ReportKinematicStaticPairs: false
+    SolverType: TGS
+    TimeStepsPerSecond: 120
+    UpdateType: Synchronous
+  task_name: scientific_experiments/task_13_blue_bottle_reaction/rebuilt_demo
+  usd_name: scene_usds/scientific_experiments/task_13_blue_bottle_reaction/rebuilt/scene
+  env_vars:
+    MDL_SYSTEM_PATH: /isaac-sim/materials/:{ASSETS_DIR}/miscs/mdl/ebench/mdl
+evaluation_configs:
+- domain_randomization: *id001
+  generation_config: *id002
+  instruction: Pour the aqueous glucose solution and then the aqueous sodium hydroxide solution into the empty Erlenmeyer flask, standing each emptied cylinder upright. Add a small amount of methylene blue solution using a glass rod and lay the rod on the clean tray. Wait until the mixture becomes colorless, then shake the flask until the mixture turns blue and set the flask upright on the table.
+  layout_config: *id003
+  mode: manual
+  num_test: 1
+  num_steps: 36000
+  preserve_score_on_invalid_state: true
+  warmup_steps: 300
+  physics_dt: 0.0083333333
+  rendering_dt: 0.0083333333
+  object_config: {}
+  physics_scene_config:
+    BounceThreshold: 0.0
+    BroadphaseType: GPU
+    CollisionSystem: PCM
+    EnableCCD: false
+    EnableEnhancedDeterminism: false
+    EnableExternalForcesEveryIteration: false
+    EnableGPUDynamics: true
+    EnableResidualReporting: false
+    EnableSceneQuerySupport: true
+    EnableStabilization: true
+    FrictionCorrelationDistance: 0.02500000037252903
+    FrictionOffsetThreshold: 0.03999999910593033
+    FrictionType: patch
+    GpuCollisionStackSize: 67108864
+    GpuFoundLostAggregatePairsCapacity: 10485760
+    GpuFoundLostPairsCapacity: 262144
+    GpuHeapCapacity: 67108864
+    GpuMaxDeformableSurfaceContacts: 1048576
+    GpuMaxHairContacts: 1048576
+    GpuMaxNumPartitions: 8
+    GpuMaxParticleContacts: 1048576
+    GpuMaxRigidContactCount: 524288
+    GpuMaxRigidPatchCount: 81920
+    GpuMaxSoftBodyContacts: 1048576
+    GpuTempBufferCapacity: 16777216
+    GpuTotalAggregatePairsCapacity: 1024
+    InvertCollisionGroupFilter: false
+    MaxBiasCoefficient: Inf
+    MaxPositionIterationCount: 255
+    MaxVelocityIterationCount: 255
+    MinPositionIterationCount: 1
+    MinVelocityIterationCount: 0
+    ReportKinematicKinematicPairs: false
+    ReportKinematicStaticPairs: false
+    SolverType: TGS
+    TimeStepsPerSecond: 120
+    UpdateType: Synchronous
+  preprocess_config:
+  - config:
+      Restitution: 0.0
+      DynamicFriction: 5
+      StaticFriction: 5
+      FrictionCombineMode: max
+      RestitutionCombineMode: multiply
+      ImprovePatchFriction: true
+    robot_type: lift2
+    type: set_robot_physics_material
+  robots:
+  - *id004
+  table_uid: table
+  task_name: scientific_experiments/task_13_blue_bottle_reaction/rebuilt_demo
+  usd_name: scene_usds/scientific_experiments/task_13_blue_bottle_reaction/rebuilt/scene
+  env_vars:
+    MDL_SYSTEM_PATH: /isaac-sim/materials/:{ASSETS_DIR}/miscs/mdl/ebench/mdl

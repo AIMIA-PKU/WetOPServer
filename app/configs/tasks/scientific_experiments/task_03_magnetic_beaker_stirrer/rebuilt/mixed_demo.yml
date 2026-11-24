@@ -1,0 +1,216 @@
+# WET-OP task_03 "Magnetic Stirring Setup and Operation" -- GenManip task config for the rebuilt scene
+# (same structure as the official task_01 validation/mixed/mixed_1.yml and the task02/04 rebuilds).
+#
+# Scene : generate_asset/scene_usds/task03/scene.usda  (built by tools/build_task03_scene.py)
+#         copy/link it to saved/assets/scene_usds/scientific_experiments/task_03_magnetic_beaker_stirrer/rebuilt/scene.usda
+#         together with single_asset/ and generate_asset/single_usds/ at the same relative location.
+# Metric: genmanip/extensions/metrics/scientific_experiments/task_03_magnetic_beaker_stirrer.py (official GenManip code):
+#         timing_1 (stir bar above the tray), timing_2/beaker_in_the_center_of_stirrer (beaker cloud mean within 18 mm of
+#         stirrer cloud mean + world (0, +12 mm) -- in the rebuilt stirrer this point IS the dial centre),
+#         timing_2/beaker_liquid_in_beaker (>= 95 % of b_liquid). The two other S2 items of the task card (stir bar in the
+#         beaker, beaker on the stirrer) and "beaker upright" use the GenManip default metrics.
+#         No official task03 config exists; uids are the prim names without "obj_".
+#
+# Scoring: GenManip averages metric_weight*status inside a stage, then averages the 2 stages.
+# Weights reproduce the official card weights (Wet-OP-Bench-doc assets/tasks.js, id 1):
+#   S1  0.4 / 2 = 0.2
+#   S2  (2.0 + 2.0 + 2.0 + 1.0 + 1.0) / 5 / 2  ->  0.2, 0.2, 0.2, 0.1, 0.1
+demonstration_configs:
+- domain_randomization: &id001
+    cameras:
+      config_path: configs/cameras/fixed_camera_lift2_scientific_experiments.yml
+      type: fixed
+    random_environment:
+      has_wall: false
+      hdr: false
+      robot_base_position: false
+      robot_eepose: false
+      table_texture: false
+      table_type: false
+      wall_texture: false
+    rewrite_instruction: false
+  generation_config: &id002
+    action_path:
+      mode: auto
+      robot: 0
+    articulation: []
+    goal:
+    # ---- S1 (0.2): stir bar lifted above the tray
+    - - - type: manip/scientific_experiments/task_03_magnetic_beaker_stirrer
+          skip_steps: 50
+          succ_cnts: 50
+          stir_bar_uid: stir_bar
+          beaker_uid: beaker
+          magnetic_stirrer_uid: magnetic_stirrer
+          steel_plate_uid: tray
+          b_liquid_mesh_prim_path: /World/_scene/task03_liquid/b_liquid/ParticleSet
+          condition_type: timing_1
+          metric_weight: 0.4
+    # ---- S2 (0.8): stir bar in beaker 0.2, beaker on stirrer 0.2, centred 0.2, liquid retained 0.1, beaker upright 0.1
+    - - - type: manip/default/sr_based_genmanip_relationship
+          skip_steps: 50
+          succ_cnts: 100
+          obj1_uid: stir_bar
+          obj2_uid: beaker
+          position: "in"
+          metric_weight: 2.0
+        - type: manip/default/sr_based_genmanip_relationship
+          skip_steps: 50
+          succ_cnts: 100
+          obj1_uid: beaker
+          obj2_uid: magnetic_stirrer
+          position: "on"
+          metric_weight: 2.0
+        - type: manip/scientific_experiments/task_03_magnetic_beaker_stirrer
+          skip_steps: 50
+          succ_cnts: 100
+          stir_bar_uid: stir_bar
+          beaker_uid: beaker
+          magnetic_stirrer_uid: magnetic_stirrer
+          steel_plate_uid: tray
+          b_liquid_mesh_prim_path: /World/_scene/task03_liquid/b_liquid/ParticleSet
+          condition_type: timing_2/beaker_in_the_center_of_stirrer
+          metric_weight: 2.0
+        - type: manip/scientific_experiments/task_03_magnetic_beaker_stirrer
+          skip_steps: 50
+          succ_cnts: 100
+          stir_bar_uid: stir_bar
+          beaker_uid: beaker
+          magnetic_stirrer_uid: magnetic_stirrer
+          steel_plate_uid: tray
+          b_liquid_mesh_prim_path: /World/_scene/task03_liquid/b_liquid/ParticleSet
+          condition_type: timing_2/beaker_liquid_in_beaker
+          metric_weight: 1.0
+        - type: manip/default/match_local_world_orientation
+          skip_steps: 50
+          succ_cnts: 100
+          obj_uid: beaker
+          constraint_spec: {type: AND, constraints: [{local_axis: Z, world_axis: Z, angle_range: [0, 10]}]}
+          metric_weight: 1.0
+    mode: manual
+    planner: curobo
+  instruction: Place the magnetic stir bar into the liquid-filled beaker, then place the beaker at the center of the magnetic stirrer platform.
+  layout_config: &id003
+    ignored_objects: []
+    type: None
+  mode: manual
+  num_episode: 50
+  object_config: {}
+  preprocess_config: []
+  robots:
+  - &id004
+    type: manip/lift2/R5a
+    usd_path: robot_usds/lift2_scientific_experiments/robot.usd
+    position: [0.0, -0.7, 0.0]
+    orientation: [0.7071067812, 0.0, 0.0, 0.7071067812]
+  table_uid: table
+  physics_scene_config:
+    BounceThreshold: 0.0
+    BroadphaseType: GPU
+    CollisionSystem: PCM
+    EnableCCD: false
+    EnableEnhancedDeterminism: false
+    EnableExternalForcesEveryIteration: false
+    EnableGPUDynamics: true
+    EnableResidualReporting: false
+    EnableSceneQuerySupport: true
+    EnableStabilization: true
+    FrictionCorrelationDistance: 0.02500000037252903
+    FrictionOffsetThreshold: 0.03999999910593033
+    FrictionType: patch
+    GpuCollisionStackSize: 67108864
+    GpuFoundLostAggregatePairsCapacity: 10485760
+    GpuFoundLostPairsCapacity: 262144
+    GpuHeapCapacity: 67108864
+    GpuMaxDeformableSurfaceContacts: 1048576
+    GpuMaxHairContacts: 1048576
+    GpuMaxNumPartitions: 8
+    GpuMaxParticleContacts: 1048576
+    GpuMaxRigidContactCount: 524288
+    GpuMaxRigidPatchCount: 81920
+    GpuMaxSoftBodyContacts: 1048576
+    GpuTempBufferCapacity: 16777216
+    GpuTotalAggregatePairsCapacity: 1024
+    InvertCollisionGroupFilter: false
+    MaxBiasCoefficient: Inf
+    MaxPositionIterationCount: 255
+    MaxVelocityIterationCount: 255
+    MinPositionIterationCount: 1
+    MinVelocityIterationCount: 0
+    ReportKinematicKinematicPairs: false
+    ReportKinematicStaticPairs: false
+    SolverType: TGS
+    TimeStepsPerSecond: 120
+    UpdateType: Synchronous
+  task_name: scientific_experiments/task_03_magnetic_beaker_stirrer/rebuilt_demo
+  usd_name: scene_usds/scientific_experiments/task_03_magnetic_beaker_stirrer/rebuilt/scene
+  env_vars:
+    MDL_SYSTEM_PATH: /isaac-sim/materials/:{ASSETS_DIR}/miscs/mdl/ebench/mdl
+evaluation_configs:
+- domain_randomization: *id001
+  generation_config: *id002
+  instruction: Place the magnetic stir bar into the liquid-filled beaker, then place the beaker at the center of the magnetic stirrer platform.
+  layout_config: *id003
+  mode: manual
+  num_test: 1
+  num_steps: 3000
+  preserve_score_on_invalid_state: true
+  warmup_steps: 300
+  physics_dt: 0.0083333333
+  rendering_dt: 0.0083333333
+  object_config: {}
+  physics_scene_config:
+    BounceThreshold: 0.0
+    BroadphaseType: GPU
+    CollisionSystem: PCM
+    EnableCCD: false
+    EnableEnhancedDeterminism: false
+    EnableExternalForcesEveryIteration: false
+    EnableGPUDynamics: true
+    EnableResidualReporting: false
+    EnableSceneQuerySupport: true
+    EnableStabilization: true
+    FrictionCorrelationDistance: 0.02500000037252903
+    FrictionOffsetThreshold: 0.03999999910593033
+    FrictionType: patch
+    GpuCollisionStackSize: 67108864
+    GpuFoundLostAggregatePairsCapacity: 10485760
+    GpuFoundLostPairsCapacity: 262144
+    GpuHeapCapacity: 67108864
+    GpuMaxDeformableSurfaceContacts: 1048576
+    GpuMaxHairContacts: 1048576
+    GpuMaxNumPartitions: 8
+    GpuMaxParticleContacts: 1048576
+    GpuMaxRigidContactCount: 524288
+    GpuMaxRigidPatchCount: 81920
+    GpuMaxSoftBodyContacts: 1048576
+    GpuTempBufferCapacity: 16777216
+    GpuTotalAggregatePairsCapacity: 1024
+    InvertCollisionGroupFilter: false
+    MaxBiasCoefficient: Inf
+    MaxPositionIterationCount: 255
+    MaxVelocityIterationCount: 255
+    MinPositionIterationCount: 1
+    MinVelocityIterationCount: 0
+    ReportKinematicKinematicPairs: false
+    ReportKinematicStaticPairs: false
+    SolverType: TGS
+    TimeStepsPerSecond: 120
+    UpdateType: Synchronous
+  preprocess_config:
+  - config:
+      Restitution: 0.0
+      DynamicFriction: 5
+      StaticFriction: 5
+      FrictionCombineMode: max
+      RestitutionCombineMode: multiply
+      ImprovePatchFriction: true
+    robot_type: lift2
+    type: set_robot_physics_material
+  robots:
+  - *id004
+  table_uid: table
+  task_name: scientific_experiments/task_03_magnetic_beaker_stirrer/rebuilt_demo
+  usd_name: scene_usds/scientific_experiments/task_03_magnetic_beaker_stirrer/rebuilt/scene
+  env_vars:
+    MDL_SYSTEM_PATH: /isaac-sim/materials/:{ASSETS_DIR}/miscs/mdl/ebench/mdl

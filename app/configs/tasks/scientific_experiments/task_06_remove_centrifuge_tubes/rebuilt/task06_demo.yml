@@ -1,0 +1,227 @@
+# WET-OP task_06 "Centrifuge Tube Unloading" (Remove centrifuge tubes) - GenManip task config for the rebuilt scene
+# (same structure as generate_asset/scene_usds/task02/configs/mixed_demo.yml, i.e. the official task_01 validation mixed_1.yml).
+#
+# Scene : generate_asset/scene_usds/task06/scene.usda  (built by tools/build_task06_scene.py from layout_demo.json)
+#         copy/link it to saved/assets/scene_usds/scientific_experiments/task_06_remove_centrifuge_tubes/rebuilt/scene.usda
+#         together with single_asset/ and generate_asset/single_usds/ at the same relative location.
+# Metric: genmanip/extensions/metrics/scientific_experiments/task_06_remove_centrifuge_tubes.py
+#         (GenManip release/1.1.0-wet-op-bench; keys primary_tube_uid, balance_tube_uid, mixed_rack_uid,
+#          centrifuge_rotor_link_uid, condition_type in {primary,balance}_tube_out_centrifuge / _insert_mixed_rack;
+#          rack threshold TUBE_IN_MIXED_RACK_THRESHOLD = 0.40). The official file has no upright check, so
+#         "upright" uses manip/default/match_local_world_orientation (our choice of 0-10 deg, as task02).
+# Lid   : manip/default/check_joint_angle on lid_joint, 0-30 deg (asset convention: 0 = fully open, 100 = closed).
+#         The lid controller is embedded in the centrifuge asset as an OmniGraph ScriptNode (/centrifuge/LidController,
+#         OnPlaybackTick; button_joint >= 2.5 mm -> lid target 0), the same mechanism GenManip enables with
+#         /app/omni.graph.scriptnode/opt_in = True. It runs in unpatched GenManip; it ticks with app updates, so the
+#         evaluation must render (world.step(render=False) does not tick it). The graph unlatches when a scene reset
+#         teleports the lid back to closed, so episodes that reuse the scene start closed. tools/centrifuge_lid_controller.py
+#         has the same trigger for our own replay scripts (it ramps the target at 90 deg/s, the graph steps it to 0);
+#         do not run both on one scene.
+#
+# Scoring: GenManip averages metric_weight*status inside a stage, then averages the stages (here 2).
+# Weights reproduce the official weights (Wet-OP-Bench-doc assets/tasks.js, id 8: weight per item x count, total 1.0):
+#   S1  lid opened to 0-30 deg                         0.4 / 2       = 0.20
+#   S2  each tube out of the rotor                     2.4 / 6 / 2   = 0.20 each
+#       each tube >=40% inside the rack hull           1.2 / 6 / 2   = 0.10 each
+#       each tube upright                              1.2 / 6 / 2   = 0.10 each
+# Articulation: GenManip registers articulations from object_config (scene.py _parse_articulation, excerpt in
+# WetOP_assets/_ref/genmanip_task14 (local reference copy)): type existed_object + is_articulated + articulation_info.part -> scene.articulation_list
+# ["centrifuge"] for check_joint_angle and part uids centrifuge_<part> (centrifuge_rotor_link for the task06 metric).
+# generation_config.articulation is filled by that parser as a dict, so it must be {} (not []). target_positions null:
+# joints start from the asset's PhysicsJointStateAPI values (lid_joint 100 deg = closed, button_joint 0).
+# The object_config key is the uid; GenManip prefixes obj_ to find /World/<uuid>/obj_<key> (verified 2026-11-22).
+# Loaded in GenManip release/1.1.0-wet-op-bench (2026-11-22): config parsing, scene, articulation registration, metrics,
+# evalgen (mode benchmark) and a full ep30 replay through ray_eval_server + EvalClient. num_steps counts physics steps
+# (1 action frame = 8 steps at 120 Hz); ep30 needs 3830 frames x 8 = 30640 steps, so num_steps is 32000.
+demonstration_configs:
+- domain_randomization: &id001
+    cameras:
+      config_path: configs/cameras/fixed_camera_lift2_scientific_experiments.yml
+      type: fixed
+    random_environment:
+      has_wall: false
+      hdr: false
+      robot_base_position: false
+      robot_eepose: false
+      table_texture: false
+      table_type: false
+      wall_texture: false
+    rewrite_instruction: false
+  generation_config: &id002
+    action_path:
+      mode: auto
+      robot: 0
+    articulation: {}
+    goal:
+    # ---- S1
+    - - - type: manip/default/check_joint_angle
+          skip_steps: 50
+          succ_cnts: 100
+          articulation_obj_uid: centrifuge
+          joint_name: lid_joint
+          angle_deg_range: [0, 30]
+          metric_weight: 0.4
+    # ---- S2
+    - - - type: manip/scientific_experiments/task_06_remove_centrifuge_tubes
+          skip_steps: 50
+          succ_cnts: 100
+          primary_tube_uid: primary_tube
+          balance_tube_uid: balance_tube
+          mixed_rack_uid: mixed_rack
+          centrifuge_rotor_link_uid: centrifuge_rotor_link
+          condition_type: primary_tube_out_centrifuge
+          metric_weight: 2.4
+        - type: manip/scientific_experiments/task_06_remove_centrifuge_tubes
+          skip_steps: 50
+          succ_cnts: 100
+          primary_tube_uid: primary_tube
+          balance_tube_uid: balance_tube
+          mixed_rack_uid: mixed_rack
+          centrifuge_rotor_link_uid: centrifuge_rotor_link
+          condition_type: balance_tube_out_centrifuge
+          metric_weight: 2.4
+        - type: manip/scientific_experiments/task_06_remove_centrifuge_tubes
+          skip_steps: 50
+          succ_cnts: 100
+          primary_tube_uid: primary_tube
+          balance_tube_uid: balance_tube
+          mixed_rack_uid: mixed_rack
+          centrifuge_rotor_link_uid: centrifuge_rotor_link
+          condition_type: primary_tube_insert_mixed_rack
+          metric_weight: 1.2
+        - type: manip/scientific_experiments/task_06_remove_centrifuge_tubes
+          skip_steps: 50
+          succ_cnts: 100
+          primary_tube_uid: primary_tube
+          balance_tube_uid: balance_tube
+          mixed_rack_uid: mixed_rack
+          centrifuge_rotor_link_uid: centrifuge_rotor_link
+          condition_type: balance_tube_insert_mixed_rack
+          metric_weight: 1.2
+        - type: manip/default/match_local_world_orientation
+          skip_steps: 50
+          succ_cnts: 100
+          obj_uid: primary_tube
+          constraint_spec: {type: AND, constraints: [{local_axis: Z, world_axis: Z, angle_range: [0, 10]}]}
+          metric_weight: 1.2
+        - type: manip/default/match_local_world_orientation
+          skip_steps: 50
+          succ_cnts: 100
+          obj_uid: balance_tube
+          constraint_spec: {type: AND, constraints: [{local_axis: Z, world_axis: Z, angle_range: [0, 10]}]}
+          metric_weight: 1.2
+    mode: manual
+    planner: curobo
+  instruction: Press the centrifuge door-opening button, remove the two centrifuge tubes, and place both centrifuge tubes in the centrifuge tube rack on the left.
+  layout_config: &id003
+    ignored_objects: []
+    type: None
+  mode: manual
+  num_episode: 50
+  object_config:
+    centrifuge:
+      type: existed_object
+      uid_list: [centrifuge]
+      is_articulated: true
+      target_positions: null
+      articulation_info:
+        is_articulated: true
+        part:
+          base_link: /base_link
+          lid_link: /lid_link
+          button_link: /button_link
+          rotor_link: /rotor_link
+  preprocess_config: []
+  robots:
+  - &id004
+    type: manip/lift2/R5a
+    usd_path: robot_usds/lift2_scientific_experiments/robot.usd
+    position: [0.0, -0.7, 0.0]
+    orientation: [0.7071067812, 0.0, 0.0, 0.7071067812]
+  table_uid: table
+  physics_scene_config: &id005
+    BounceThreshold: 0.0
+    BroadphaseType: GPU
+    CollisionSystem: PCM
+    EnableCCD: false
+    EnableEnhancedDeterminism: false
+    EnableExternalForcesEveryIteration: false
+    EnableGPUDynamics: true
+    EnableResidualReporting: false
+    EnableSceneQuerySupport: true
+    EnableStabilization: true
+    FrictionCorrelationDistance: 0.02500000037252903
+    FrictionOffsetThreshold: 0.03999999910593033
+    FrictionType: patch
+    GpuCollisionStackSize: 67108864
+    GpuFoundLostAggregatePairsCapacity: 10485760
+    GpuFoundLostPairsCapacity: 262144
+    GpuHeapCapacity: 67108864
+    GpuMaxDeformableSurfaceContacts: 1048576
+    GpuMaxHairContacts: 1048576
+    GpuMaxNumPartitions: 8
+    GpuMaxParticleContacts: 1048576
+    GpuMaxRigidContactCount: 524288
+    GpuMaxRigidPatchCount: 81920
+    GpuMaxSoftBodyContacts: 1048576
+    GpuTempBufferCapacity: 16777216
+    GpuTotalAggregatePairsCapacity: 1024
+    InvertCollisionGroupFilter: false
+    MaxBiasCoefficient: Inf
+    MaxPositionIterationCount: 255
+    MaxVelocityIterationCount: 255
+    MinPositionIterationCount: 1
+    MinVelocityIterationCount: 0
+    ReportKinematicKinematicPairs: false
+    ReportKinematicStaticPairs: false
+    SolverType: TGS
+    TimeStepsPerSecond: 120
+    UpdateType: Synchronous
+  task_name: scientific_experiments/task_06_remove_centrifuge_tubes/rebuilt_demo
+  usd_name: scene_usds/scientific_experiments/task_06_remove_centrifuge_tubes/rebuilt/scene
+  env_vars:
+    MDL_SYSTEM_PATH: /isaac-sim/materials/:{ASSETS_DIR}/miscs/mdl/ebench/mdl
+evaluation_configs:
+- domain_randomization: *id001
+  generation_config: *id002
+  instruction: Press the centrifuge door-opening button, remove the two centrifuge tubes, and place both centrifuge tubes in the centrifuge tube rack on the left.
+  layout_config: *id003
+  mode: benchmark             # GenManip evalgen: benchmark mode saves the task (meta_info) without executing actions;
+                              # with manual + a metric goal, action_path auto would try to execute the metrics as actions
+  num_test: 1
+  num_steps: 32000
+  preserve_score_on_invalid_state: true
+  warmup_steps: 300
+  physics_dt: 0.0083333333
+  rendering_dt: 0.0083333333
+  preprocess_config:          # same as the official task01 validation config (gripper pad friction)
+  - config:
+      Restitution: 0.0
+      DynamicFriction: 5
+      StaticFriction: 5
+      FrictionCombineMode: max
+      RestitutionCombineMode: multiply
+      ImprovePatchFriction: true
+    robot_type: lift2
+    type: set_robot_physics_material
+  object_config:
+    centrifuge:
+      type: existed_object
+      uid_list: [centrifuge]
+      is_articulated: true
+      target_positions: null
+      articulation_info:
+        is_articulated: true
+        part:
+          base_link: /base_link
+          lid_link: /lid_link
+          button_link: /button_link
+          rotor_link: /rotor_link
+  physics_scene_config: *id005
+  robots:
+  - *id004
+  table_uid: table
+  task_name: scientific_experiments/task_06_remove_centrifuge_tubes/rebuilt_demo
+  usd_name: scene_usds/scientific_experiments/task_06_remove_centrifuge_tubes/rebuilt/scene
+  env_vars:
+    MDL_SYSTEM_PATH: /isaac-sim/materials/:{ASSETS_DIR}/miscs/mdl/ebench/mdl

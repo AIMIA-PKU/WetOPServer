@@ -51,3 +51,9 @@ YAML 中的 `num_test: 1` 表示当前示例使用一个 seed。场景 USD 定�
 5. 按项目根 README 的 `genmanip_client submit` 命令提交新 YAML，再用 SDK `reset()` 检查初态与四路观测，最后用 `step()` 检查动作和终止条件。新任务若需新的评分或成功判据，还必须实现 GenManip 能调用的对应任务逻辑。
 
 当前两条软链直接指向下载的 Validation 数据；在 `saved/assets` 或 `saved/tasks` 下新增文件，会写入该 SSD 数据目录。`diagnostics/`、`demonstrations/`、`eval_results/` 和 `logs/` 留在 HDD，不会写入 Validation 数据。
+
+## 已归档的重建任务 YAML
+
+构建方提供的 17 份 YAML 已原样放在 configs/tasks/scientific_experiments/对应任务/rebuilt/ 下，覆盖 Task02–07、Task13、Task16（z2）和 Task20（z6）。官方 Task01 YAML 保持原样。
+
+这些配置的场景入口和 seed 初态尚未就位；目前不能用它们完成 reset。Task08、09、10、11、12、14、15（z1）、17（z3）、18（z4）、19（z5）未提供 YAML，未创建占位配置。
