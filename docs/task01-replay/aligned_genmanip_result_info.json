@@ -1,0 +1,29 @@
+{
+  "score": 1.0,
+  "policy_avg_inference_time_ms": 1.1211637190688124,
+  "steps": 2113,
+  "success_rate": 1,
+  "log_info": {
+    "episode_start_time": "2026-11-24_14_51_21_584944",
+    "episode_end_time": "2026-11-24_14_55_09_039157",
+    "metric_score": [
+      [
+        [
+          0.6
+        ]
+      ],
+      [
+        [
+          1.2
+        ]
+      ],
+      [
+        [
+          1.8,
+          0.9,
+          0.9
+        ]
+      ]
+    ]
+  }
+}

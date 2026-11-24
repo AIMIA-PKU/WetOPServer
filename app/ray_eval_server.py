@@ -141,5 +141,12 @@ if __name__ == "__main__":
     pool = IsaacWorkerPool(
         args, current_dir, world_size=ray.cluster_resources().get("GPU", 0)
     )
+    # Keep official saved/tasks as the default; derived replay states are opt-in.
+    tasks_dir = os.environ.get("WETOP_TASKS_DIR")
+    if tasks_dir:
+        if not os.path.isdir(tasks_dir):
+            raise FileNotFoundError(f"WETOP_TASKS_DIR does not exist: {tasks_dir}")
+        pool.default_config["TASKS_DIR"] = tasks_dir
+        print(f"Using task initial states from {tasks_dir}")
     server.register_worker_pool(pool)
     server.run()

@@ -1,0 +1,37 @@
+{
+  "run_id": "wetop_train_ep30_replay",
+  "task": "scientific_experiments/task_01_pour_flask_to_cylinder/train_ep30",
+  "episode": 30,
+  "initial_state_source": "app/configs/initial_states/task01/train_ep30.json",
+  "robot_initial_joint_max_abs_diff_rad": 5.359295755624771e-06,
+  "robot_initial_gripper_max_abs_diff_m": 1.6065314412117004e-07,
+  "reconstructed_robot_max_abs_diff_before_override": 8.09086486697197e-06,
+  "liquid_particle_count": 1535,
+  "train_frames_available": 2262,
+  "train_actions_submitted": 2144,
+  "executed_steps": 2113,
+  "score": 1.0,
+  "sr": 1.0,
+  "subgoal_metric_score": [
+    [
+      [
+        0.6
+      ]
+    ],
+    [
+      [
+        1.2
+      ]
+    ],
+    [
+      [
+        1.8,
+        0.9,
+        0.9
+      ]
+    ]
+  ],
+  "reconstruction_source_json_sha256": "d4b0be9efd2282e64d2f05c646b7c3aed9cd88cdfe43035d768cc097cae36c2e",
+  "train_parquet_sha256": "87411714e11fa236920b379e389af11fa8bf70d25028faa17d5160000c277367",
+  "note": "Task01 train episode 30 reconstructed initial state; local diagnostic, not official A/B benchmark."
+}

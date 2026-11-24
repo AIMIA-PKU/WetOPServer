@@ -1,0 +1,39 @@
+{
+  "task": "task_01_pour_flask_to_cylinder",
+  "train_episode": 30,
+  "train_frames": 2262,
+  "selected_actions": 2262,
+  "train_parquet": "/cluster/ssd/DATASETS/InternRobotics/WETOP-Bench-Train/task_01_pour_flask_to_cylinder/data/chunk-000/episode_000030.parquet",
+  "run_id": "wetop_replay_task01_ep30",
+  "endpoint": "http://127.0.0.1:18087",
+  "chunk_size": 32,
+  "initial_state_match": false,
+  "warning": "Training episode has no matching public seed-000 initial state; score is diagnostic only.",
+  "started_at": "2026-11-24T14:10:45.046730+00:00",
+  "reset_instruction": "Keep the graduated cylinder at a slight tilt while pouring a measured portion from the Erlenmeyer flask without spilling to reach 10%–60% capacity, then stand both vessels securely upright on the table.",
+  "joint_initial_max_abs_diff": 0.07515073732065503,
+  "gripper_initial_max_abs_diff": 0.002652800059877336,
+  "training_actions_submitted": 2262,
+  "hold_actions_submitted": 1238,
+  "executed_steps": 3500,
+  "done": false,
+  "worker_fields": [
+    "episode_result",
+    "metric",
+    "obs"
+  ],
+  "metric": {
+    "*scientific_experiments/task_01_pour_flask_to_cylinder/validation_mixed_1": {
+      "score": 0.0,
+      "sr": 0.0
+    }
+  },
+  "episode_result": {
+    "episode_id": "scientific_experiments/wetop_replay_task01_ep30/scientific_experiments/task_01_pour_flask_to_cylinder/validation_mixed_1/000",
+    "task_name": "scientific_experiments/task_01_pour_flask_to_cylinder/validation_mixed_1",
+    "seed": "000",
+    "score": 0.0,
+    "sr": 0.0
+  },
+  "finished_at": "2026-11-24T14:35:39.765086+00:00"
+}

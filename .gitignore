@@ -13,3 +13,4 @@ __pycache__/
 !/app/saved/assets
 !/app/saved/tasks
 /docker/
+/app/derived_tasks/

@@ -12,4 +12,4 @@ export ACCEPT_EULA=Y OMNI_KIT_ACCEPT_EULA=YES PRIVACY_CONSENT=N RAY_ADDRESS=loca
 export PYTHONUNBUFFERED=1
 
 printf "Starting GenManip on http://127.0.0.1:18087 (initial startup may take about a minute)...\n"
-exec /isaac-sim/python.sh ray_eval_server.py --host 127.0.0.1 --port 18087
+exec /isaac-sim/python.sh ray_eval_server.py --host 127.0.0.1 --port 18087 "$@"
