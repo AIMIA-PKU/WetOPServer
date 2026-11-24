@@ -1,0 +1,15 @@
+/.env
+/runtime/
+/client_results/
+/.cache/
+/app/logs/
+/app/client_results/
+/app/saved/*
+__pycache__/
+*.pyc
+*.log
+
+/.venv/
+!/app/saved/assets
+!/app/saved/tasks
+/docker/

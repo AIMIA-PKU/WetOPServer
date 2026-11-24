@@ -1,0 +1,126 @@
+# Development views from the upstream Lift2 SimBox calibration.
+# The original scientific camera calibration is not part of the public payload.
+top_camera:
+  exists: true
+  frequency: 60
+  name: top_camera
+  camera_params:
+  - 323.52
+  - 430.8933333333334
+  - 319.55
+  - 242.9066666666667
+  position:
+  - 0.1
+  - 0.02
+  - 0.03
+  orientation:
+  - 0.6602
+  - 0.2534
+  - -0.2534
+  - -0.6602
+  prim_path: /lift2/lift2/lift2/h_link6/Camera
+  resolution:
+  - 640
+  - 480
+  pixel_size: 3.0
+  f_number: 2.0
+  focus_distance: 0.6
+  with_distance: false
+  with_semantic: false
+  with_bbox2d: false
+  with_bbox3d: false
+  with_motion_vector: false
+  camera_axes: usd
+overlook_camera:
+  exists: true
+  frequency: 60
+  name: overlook_camera
+  camera_params:
+  - 323.52
+  - 430.8933333333334
+  - 319.55
+  - 242.9066666666667
+  position:
+  - 0.3
+  - 0.0
+  - 1.5
+  orientation:
+  - 0.70106
+  - 0.0923
+  - -0.0923
+  - -0.70106
+  prim_path: /lift2/lift2/lift2/base_link/Camera_overlook
+  resolution:
+  - 640
+  - 480
+  pixel_size: 3.0
+  f_number: 2.0
+  focus_distance: 0.6
+  with_distance: false
+  with_semantic: false
+  with_bbox2d: false
+  with_bbox3d: false
+  with_motion_vector: false
+  camera_axes: usd
+left_camera:
+  exists: true
+  frequency: 60
+  name: left_camera
+  camera_params:
+  - 433.89
+  - 433.38
+  - 322.79
+  - 243.14
+  position:
+  - 0.07
+  - 0.01
+  - 0.08
+  orientation:
+  - 0.62
+  - 0.33
+  - -0.33
+  - -0.62
+  prim_path: /lift2/lift2/lift2/fl/link6/Camera
+  resolution:
+  - 640
+  - 480
+  pixel_size: 3.0
+  f_number: 2.0
+  focus_distance: 0.6
+  with_distance: false
+  with_semantic: false
+  with_bbox2d: false
+  with_bbox3d: false
+  with_motion_vector: false
+  camera_axes: usd
+right_camera:
+  exists: true
+  frequency: 60
+  name: right_camera
+  camera_params:
+  - 433.89
+  - 433.38
+  - 322.79
+  - 243.14
+  position:
+  - 0.07
+  - 0.01
+  - 0.08
+  orientation:
+  - 0.62
+  - 0.33
+  - -0.33
+  - -0.62
+  prim_path: /lift2/lift2/lift2/fr/link6/Camera
+  resolution:
+  - 640
+  - 480
+  pixel_size: 3.0
+  f_number: 2.0
+  focus_distance: 0.6
+  with_distance: false
+  with_semantic: false
+  with_bbox2d: false
+  with_bbox3d: false
+  with_motion_vector: false
+  camera_axes: usd
