@@ -1,0 +1,36 @@
+╭────────────────────────────────────────────────╮
+│           GenManip Evaluation Client           │
+╰────────────────────────────────────────────────╯
+
+→ Results directory: /cluster/hdd/czs/projects/WetOPServer/client_results
+→ Client UID: d7da7532
+→ Connected to server: http://127.0.0.1:18087
+→ Workers: ['0']
+→ Save process: False
+→ Save result: False
+→ Plot on episode end: False
+
+Calling reset() (cold start may take several minutes)...
+→ Reset complete in 111.95s
+→ Environment reset complete
+
+instruction: Keep the graduated cylinder at a slight tilt while pouring a measured portion from the Erlenmeyer flask without spilling to reach 10%–60% capacity, then stand both vessels securely upright on the table.
+state.joints: [-0.07495998 -0.0055066   0.00396797 -0.01201556 -0.02231641 -0.03108979
+  0.07648586  0.00707607  0.01006667  0.02683574  0.0108835   0.05047584]
+state.gripper: [0.00173453 0.00173452 0.00165761 0.00165761]
+state.base: [ 2.0021213e-08 -1.2619616e-09  3.6186856e-09]
+video.top_camera_view (480, 640, 3)
+video.overlook_camera_view (480, 640, 3)
+video.left_camera_view (480, 640, 3)
+video.right_camera_view (480, 640, 3)
+step wall time (s): 0.216
+done: False
+next state.joints: [-0.07496321 -0.00550377  0.00396658 -0.01201536 -0.0223055  -0.03109026
+  0.07648257  0.00707858  0.01006451  0.0268354   0.01089482  0.05047537]
+video.top_camera_view (480, 640, 3)
+video.overlook_camera_view (480, 640, 3)
+video.left_camera_view (480, 640, 3)
+video.right_camera_view (480, 640, 3)
+
+✓ Client closed.
+Images saved to: /cluster/hdd/czs/projects/WetOPServer/client_results/sdk_debug/20261124T092622Z

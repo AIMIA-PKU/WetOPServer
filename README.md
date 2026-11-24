@@ -101,3 +101,14 @@ python sdk_debug.py
 ```
 
 需要让该示例再执行一次 `step()` 时，追加 `--step`。图像写入 `client_results/sdk_debug/`。目前只对公开 task_01 的 seed `000` 完成过完整 `reset()`，返回四路 480×640 观测；`step()` 已完成一帧接口测试。
+
+## Task 01 调试样例：同一初态的 reset 与单步 step
+
+以下图片来自公开的 `task_01_pour_flask_to_cylinder`、seed `000` 的同一次 SDK 运行。`reset()` 返回指令、双臂关节与夹爪状态，以及四路 640×480 RGB；随后发送 `fake_action("r5a", "lift2", "joint_position")` 做一次接口测试。该动作仅用于验证 `step()`，`done=False`，不代表完成倒液任务。此次 `reset()` 用时 111.95 秒，单次 `step()` 往返用时 0.216 秒。[查看完整终端记录](docs/task01-debug/receipt.txt)。
+
+| 视角 | reset 后 | 单步 step 后 |
+| --- | --- | --- |
+| 顶部 | <img src="docs/task01-debug/reset_top_camera_view.png" width="320" alt="task01 reset 顶部视角"> | <img src="docs/task01-debug/step_top_camera_view.png" width="320" alt="task01 step 顶部视角"> |
+| 俯视 | <img src="docs/task01-debug/reset_overlook_camera_view.png" width="320" alt="task01 reset 俯视视角"> | <img src="docs/task01-debug/step_overlook_camera_view.png" width="320" alt="task01 step 俯视视角"> |
+| 左侧 | <img src="docs/task01-debug/reset_left_camera_view.png" width="320" alt="task01 reset 左侧视角"> | <img src="docs/task01-debug/step_left_camera_view.png" width="320" alt="task01 step 左侧视角"> |
+| 右侧 | <img src="docs/task01-debug/reset_right_camera_view.png" width="320" alt="task01 reset 右侧视角"> | <img src="docs/task01-debug/step_right_camera_view.png" width="320" alt="task01 step 右侧视角"> |
